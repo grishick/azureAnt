@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="build" name="azureant">
+	<property environment="env"/>
+	<property name="env.JAVA_TOOL_OPTIONS" value="-Dfile.encoding=UTF8"/>
+	<property name="build.src" value="${basedir}/src" />
+	<property name="java.build.lib" value="${basedir}/jars/" />
+	<property name="build.out" value="${basedir}/build" />
+	<property name="dist.dir" value="${basedir}/dist" />
+	<property name="build.classes" value="${build.out}/classes" />
+	<property name="final.name" value="azureant" />
+	
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+		<classpath>
+			<pathelement location="libs/ant-contrib-1.0b1.jar"/>
+		</classpath>
+	</taskdef>
+	
+
+    <path id="java.lookasta.classpath">
+        <pathelement location="${build.classes}"/>
+        <fileset dir="${java.build.lib}">
+        	<include name="*.jar" />
+        </fileset>
+        <fileset dir="${dist.dir}">
+        	<include name="*.jar" />
+        </fileset>        
+    </path>
+
+	<target name="init">
+		<mkdir dir="${build.classes}" />
+		<mkdir dir="${dist.dir}" />
+	</target>
+
+	<target name="build" depends="init" >
+		<javac destdir="${build.classes}" debug="true" debuglevel="lines,vars,source" encoding="UTF-8">
+			<src path="${build.src}" />
+			<classpath>
+				<path refid="java.lookasta.classpath" />
+			</classpath>
+		</javac>
+	</target>
+	
+	<target name="jar" depends="build">
+		<mkdir dir="${build.classes}/META-INF" />
+		<jar jarfile="${dist.dir}/${final.name}.jar" basedir="${build.classes}" manifest="conf/MANIFEST.MF" />
+	</target>
+	
+	<target name="test" description="Upload test file to azure" depends="jar">
+        <taskdef name="azurefileup" classname="org.citybot.ant.AzureBlobFileUpload" >
+        	<classpath>
+				<path refid="java.lookasta.classpath" />
+			</classpath>
+		</taskdef>
+        <azurefileup file="azureanttest.txt" blob="azureanttest.txt" container="nameofyourcontainer" list="true" create="true" account="accountname" key="azurestoragekey"/>
+        
+        <taskdef name="azurefiledown" classname="org.citybot.ant.AzureBlobFileDownload" >
+        	<classpath>
+				<path refid="java.lookasta.classpath" />
+			</classpath>
+		</taskdef>
+        <azurefiledown file="azureanttest_download.txt" blob="azureanttest.txt" container="nameofyourcontainer" account="accountname" key="azurestoragekey"/>
+    </target>
+	<target name="clean">
+		<delete dir="${build.out}" />
+		<delete dir="${dist.dir}" />
+	</target>
+</project>
+
