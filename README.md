@@ -60,11 +60,10 @@ to upload a file to your Windows Azure blob store:
 5. Task parameters:
 
     common parameters (both azurefileup and azurefiledown tasks)
-        account - string, required. Your Windows Azure Storage Account name. You can manage these in the properties of your Windows Azure container by
-        clicking on "Manage Access Keys" at the bottom of Azure Manager screen.
         
-        key - string, required. Your Windows Azure Storage Account access key. You can manage these in the properties of your Windows Azure container by
-        clicking on "Manage Access Keys" at the bottom of Azure Manager screen.
+        account - string, required. Your Windows Azure Storage Account name. You can manage these in the properties of your Windows Azure container by clicking on "Manage Access Keys" at the bottom of Azure Manager screen.
+        
+        key - string, required. Your Windows Azure Storage Account access key. You can manage these in the properties of your Windows Azure container by clicking on "Manage Access Keys" at the bottom of Azure Manager screen.
     
     azurefileup:
     
