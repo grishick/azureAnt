@@ -6,9 +6,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
+import java.util.Iterator;
+import java.util.Vector;
 
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Task;
+import org.apache.tools.ant.types.FileSet;
+import org.apache.tools.ant.types.selectors.FileSelector;
 
 import com.microsoft.windowsazure.services.blob.client.BlobContainerPermissions;
 import com.microsoft.windowsazure.services.blob.client.BlobContainerPublicAccessType;
@@ -20,17 +25,13 @@ import com.microsoft.windowsazure.services.core.storage.CloudStorageAccount;
 import com.microsoft.windowsazure.services.core.storage.StorageException;
 
 public class AzureBlobFileUpload extends Task {
-	String blob;
 	String container;
 	String account;
 	String key;
 	String protocol = "http";
-	String file;
+	private Vector filesets = new Vector();
 	Boolean create = true;
 	Boolean list = false;
-	public void setBlob(String blob) {
-		this.blob = blob;
-	}
 	public void setContainer(String container) {
 		this.container = container;
 	}
@@ -46,17 +47,14 @@ public class AzureBlobFileUpload extends Task {
 	public void setCreate(Boolean create) {
 		this.create = create;
 	}
-	public void setFile(String file) {
-		this.file = file;
-	}
 
 	public void setList(Boolean list) {
 		this.list = list;
 	}
+	public void addFileset(FileSet fileset) {
+        filesets.add(fileset);
+    }
 	public void execute() {
-        if (blob==null) {
-            throw new BuildException("Property 'blob' is required");
-        }
         if (container==null) {
             throw new BuildException("Property 'container' is required");
         }
@@ -66,8 +64,8 @@ public class AzureBlobFileUpload extends Task {
         if (key==null) {
             throw new BuildException("Property 'key' is required");
         }
-        if(file == null) {
-        	throw new BuildException("Property 'file' is required");
+        if(filesets.isEmpty()) {
+        	throw new BuildException("A nested 'fileset' is required");
         }
         try {
         	String storageConnectionString = String.format("DefaultEndpointsProtocol=%s;AccountName=%s;AccountKey=%s", protocol, account, key);
@@ -85,13 +83,24 @@ public class AzureBlobFileUpload extends Task {
 			}
 
 			// Create or overwrite the "myimage.jpg" blob with contents from a local file
-			CloudBlockBlob blobHandle = blobContainer.getBlockBlobReference(blob);
-			File source = new File(file);
-			blobHandle.upload(new FileInputStream(source), source.length());
+			
+			for(Iterator itFSets = filesets.iterator(); itFSets.hasNext(); ) {
+				FileSet fs = (FileSet)itFSets.next();
+				DirectoryScanner ds = fs.getDirectoryScanner(getProject());        
+	            String[] includedFiles = ds.getIncludedFiles();
+		        for(int i=0; i<includedFiles.length; i++) {
+		        	String filename = includedFiles[i].replace('\\','/');
+		        	File source = new File(ds.getBasedir() + "/" + filename);
+		        	String blobname = filename.substring(filename.lastIndexOf("/")+1);
+	                CloudBlockBlob blobHandle = blobContainer.getBlockBlobReference(blobname);
+	                blobHandle.upload(new FileInputStream(source), source.length());
+		        }
+			}
+			
 			if(list) {
 				// Loop over blobs within the container and output the URI to each of them
 				for (ListBlobItem blobItem : blobContainer.listBlobs()) {
-					project.log(blobItem.getUri().toString());
+					getProject().log(blobItem.getUri().toString());
 				}
 			}
 		} catch (InvalidKeyException e) {
