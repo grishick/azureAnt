@@ -1,10 +1,6 @@
 package org.citybot.ant;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
@@ -13,7 +9,6 @@ import com.microsoft.windowsazure.services.blob.client.CloudBlobClient;
 import com.microsoft.windowsazure.services.blob.client.CloudBlobContainer;
 import com.microsoft.windowsazure.services.blob.client.CloudBlockBlob;
 import com.microsoft.windowsazure.services.core.storage.CloudStorageAccount;
-import com.microsoft.windowsazure.services.core.storage.StorageException;
 
 public class AzureBlobFileDownload extends Task {
 	String blob;
@@ -22,6 +17,7 @@ public class AzureBlobFileDownload extends Task {
 	String key;
 	String protocol = "http";
 	String file;
+	String notfound = "continue";
 	public void setBlob(String blob) {
 		this.blob = blob;
 	}
@@ -39,6 +35,9 @@ public class AzureBlobFileDownload extends Task {
 	}
 	public void setFile(String file) {
 		this.file = file;
+	}
+	public void setNotFound(String notfound) {
+		this.notfound = notfound;
 	}
 	public void execute() {
         if (blob==null) {
@@ -65,21 +64,26 @@ public class AzureBlobFileDownload extends Task {
 			// Create or overwrite the "myimage.jpg" blob with contents from a local file
 			CloudBlockBlob blobHandle = blobContainer.getBlockBlobReference(blob);
 			if(blobHandle == null || !blobHandle.exists()) {
-				project.log("Cannot find blob " + blob);
-				throw new BuildException("Cannot find blob " + blob);
+				if(notfound.equalsIgnoreCase("fail")) {
+					getProject().log("Cannot find blob " + blob);
+					throw new BuildException("Cannot find blob " + blob);
+				} else if(notfound.equalsIgnoreCase("continue")) {
+					//
+				} else if(notfound.equalsIgnoreCase("log")) {
+					getProject().log("Cannot find blob " + blob);
+				} 
 			}
+			getProject().log("Downloading blob " + blob + " to " + file);
 			blobHandle.download(new FileOutputStream(file));
-		} catch (InvalidKeyException e) {
-			throw new BuildException(e);
-		} catch (URISyntaxException e) {
-			throw new BuildException(e);
-		} catch (StorageException e) {
-			throw new BuildException(e);
-		} catch (FileNotFoundException e) {
-			throw new BuildException(e);
-		} catch (IOException e) {
-			throw new BuildException(e);
-		}
+		} catch (Exception e) {
+			if(notfound.equalsIgnoreCase("fail")) {
+				throw new BuildException(e);
+			} else if(notfound.equalsIgnoreCase("continue")) {
+				//
+			} else if(notfound.equalsIgnoreCase("log")) {
+				getProject().log("Cannot find blob " + blob);
+			} 
+		} 
     }
 	
 }
