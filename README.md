@@ -67,6 +67,7 @@ to upload a file to your Windows Azure blob store:
         clicking on "Manage Access Keys" at the bottom of Azure Manager screen.
     
     azurefileup:
+    
         container - string, required. Name of the blob container where you want the files to be uploaded.
         
         list -  boolean, optional. If set to "true" will print out a list of keys in the blob container where the new file is being uploaded after 
@@ -79,6 +80,7 @@ to upload a file to your Windows Azure blob store:
         <fileset> - FileSet, required. Ant <fileset> element that defines the list of files to be uploaded. See more here: http://ant.apache.org/manual/Types/fileset.html
         
     azurefiledown:
+    
         container - string, required. Name of the blob container where the blob that you want to download is located.
         
         blob - string, required. Name of the blob that you want to download.
