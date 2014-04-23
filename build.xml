@@ -8,6 +8,9 @@
 	<property name="dist.dir" value="${basedir}/dist" />
 	<property name="build.classes" value="${build.out}/classes" />
 	<property name="final.name" value="azureant" />
+	<property name="azure.key" value="" />
+	<property name="azure.account" value="azureant" />
+	<property name="azure.container" value="testfiles" />
 	
 	<taskdef resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
@@ -51,14 +54,18 @@
 				<path refid="java.lookasta.classpath" />
 			</classpath>
 		</taskdef>
-        <azurefileup file="azureanttest.txt" blob="azureanttest.txt" container="nameofyourcontainer" list="true" create="true" account="accountname" key="azurestoragekey"/>
+        <azurefileup container="${azure.container}" list="true" create="true" account="${azure.account}" key="${azure.key}">
+        	<fileset dir="testfiles/">
+        		<include name="*.txt"/>
+        	</fileset>
+        </azurefileup>
         
         <taskdef name="azurefiledown" classname="org.citybot.ant.AzureBlobFileDownload" >
         	<classpath>
 				<path refid="java.lookasta.classpath" />
 			</classpath>
 		</taskdef>
-        <azurefiledown file="azureanttest_download.txt" blob="azureanttest.txt" container="nameofyourcontainer" account="accountname" key="azurestoragekey"/>
+        <azurefiledown file="azureanttest_download.txt" blob="azureanttest.txt" container="${azure.container}" account="${azure.account}" key="${azure.key}"/>
     </target>
 	<target name="clean">
 		<delete dir="${build.out}" />
