@@ -77,7 +77,7 @@ public class AzureBlobFileUpload extends Task {
         	throw new BuildException("A nested 'fileset' is required");
         }
         if (blobPath==null) {
-        	blobPath = "";
+        	blobPath = null;
         }        
         
         try {
