@@ -28,7 +28,7 @@ public class AzureBlobFileUpload extends Task {
 	String container;
 	String account;
 	String key;
-	String blobPath;
+	String blobpath;
 	String protocol = "http";
 	private Vector filesets = new Vector();
 	Boolean create = true;
@@ -55,14 +55,13 @@ public class AzureBlobFileUpload extends Task {
 	public void addFileset(FileSet fileset) {
         filesets.add(fileset);
     	}
-
-	public String getBlobPath() {
-		return blobPath;
-	}
-	public void setBlobPath(String blobPath) {
-		this.blobPath = blobPath;
-	}
 	
+	public String getBlobpath() {
+		return blobpath;
+	}
+	public void setBlobpath(String blobpath) {
+		this.blobpath = blobpath;
+	}
 	public void execute() {
         if (container==null) {
             throw new BuildException("Property 'container' is required");
@@ -101,8 +100,8 @@ public class AzureBlobFileUpload extends Task {
 		        	String filename = includedFiles[i].replace('\\','/');
 		        	File source = new File(ds.getBasedir() + "/" + filename);
 		        	String blobname = filename.substring(filename.lastIndexOf("/")+1);
-		        	if(blobPath!=null){
-		        		blobname = blobPath + File.pathSeparator + blobname;
+		        	if(getBlobpath()!=null){
+		        		blobname = getBlobpath() + File.pathSeparator + blobname;
 		        	}
 	                CloudBlockBlob blobHandle = blobContainer.getBlockBlobReference(blobname);
 	                blobHandle.upload(new FileInputStream(source), source.length());
