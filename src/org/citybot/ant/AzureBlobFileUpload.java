@@ -54,7 +54,7 @@ public class AzureBlobFileUpload extends Task {
 	}
 	public void addFileset(FileSet fileset) {
         filesets.add(fileset);
-    }
+    	}
 
 	public String getBlobPath() {
 		return blobPath;
