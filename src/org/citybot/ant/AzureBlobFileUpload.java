@@ -101,7 +101,7 @@ public class AzureBlobFileUpload extends Task {
 		        	File source = new File(ds.getBasedir() + "/" + filename);
 		        	String blobname = filename.substring(filename.lastIndexOf("/")+1);
 		        	if(getBlobpath()!=null){
-		        		blobname = getBlobpath() + File.pathSeparator + blobname;
+		        		blobname = getBlobpath() + "/" + blobname;
 		        	}
 	                CloudBlockBlob blobHandle = blobContainer.getBlockBlobReference(blobname);
 	                blobHandle.upload(new FileInputStream(source), source.length());
