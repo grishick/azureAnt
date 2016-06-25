@@ -76,10 +76,6 @@ public class AzureBlobFileUpload extends Task {
         if(filesets.isEmpty()) {
         	throw new BuildException("A nested 'fileset' is required");
         }
-        if (blobPath==null) {
-        	blobPath = null;
-        }        
-        
         try {
         	String storageConnectionString = String.format("DefaultEndpointsProtocol=%s;AccountName=%s;AccountKey=%s", protocol, account, key);
 			CloudStorageAccount storageAccount = CloudStorageAccount.parse(storageConnectionString);
